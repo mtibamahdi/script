@@ -3,13 +3,13 @@ import subprocess
 def run_hashcat(target_hash):
     # Hashcat command to use all 9 GPUs and brute force a 64-character hex string
     command = [
-        "hashcat", "-m", "1400",  # 1400 = SHA-256
-        "-a", "3",  # Attack mode 3 = brute force
-        "--backend-devices=all",  # Use all GPUs
-        "--status",  # Show progress
-        "--status-timer=10",  # Update status every 10 seconds
-        target_hash, "?h" * 64  # 64-character hex brute force
-    ]
+    "hashcat", "-m", "1400",
+    "-a", "3",
+    "--status",
+    "--status-timer=10",
+    target_hash, "?h" * 64
+]
+
 
     print(f"🔥 Running Hashcat on 9 GPUs for target hash: {target_hash}")
     subprocess.run(command)
