@@ -14,8 +14,6 @@ NUM_GPUS = 9
 @cuda.jit(device=True)
 def sha256_cuda(input_bytes):
     hash_value = 0
-    for b in input
-    hash_value = 0
     for b in input_bytes:
         hash_value = ((hash_value << 5) - hash_value) + b
         hash_value &= 0xFFFFFFFFFFFFFFFF  # Keep it within 64-bit
