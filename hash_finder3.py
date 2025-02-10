@@ -1,0 +1,52 @@
+import hashlib
+import random
+import string
+import cupy as cp
+import numpy as np
+
+# Function to generate a random string
+def generate_random_string(length=64):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+
+# Function to hash the string using SHA-256
+def sha256_hash(input_string):
+    return hashlib.sha256(input_string.encode()).hexdigest()
+
+# Convert the hash to a GPU array of integers
+def sha256_gpu(input_string):
+    hash_result = hashlib.sha256(input_string.encode()).hexdigest()
+    byte_array = bytes.fromhex(hash_result)
+    return cp.asarray(np.frombuffer(byte_array, dtype=np.uint8))  # Convert to uint8
+
+# Function to repeatedly hash using GPU until target hash is found
+def find_matching_hash_gpu(target_hash):
+    # Step 1: Generate a random string and hash it
+    random_string = generate_random_string()
+    current_hash = sha256_hash(random_string)
+    print(f"Initial random hash: {current_hash}")
+
+    # Convert the target hash to a GPU array of integers
+    target_hash_bytes = bytes.fromhex(target_hash)
+    target_hash_gpu = cp.asarray(np.frombuffer(target_hash_bytes, dtype=np.uint8))
+
+    # Convert the initial hash to a GPU array
+    current_hash_gpu = sha256_gpu(current_hash)
+
+    # Step 2: Repeatedly hash using GPU until we find the target
+    attempt = 0
+    while not cp.array_equal(current_hash_gpu[:6], target_hash_gpu[:6]):  # Compare first 6 bytes
+        current_hash = sha256_hash(current_hash)  # Hash the current hash string
+        current_hash_gpu = sha256_gpu(current_hash)  # Convert to GPU array
+        
+        attempt += 1
+        if attempt % 1000 == 0:
+            print(f"[{attempt}] Current hash: {current_hash}")  # Print progress
+
+    print(f"✅ Found matching hash: {current_hash} in {attempt} attempts!")
+    return current_hash  # Return the final hash that matches the target
+
+# Example target hash (replace with the target SHA-256 hash you're looking for)
+target_sha256 = "40c45198f179492a4008d19f4e67f7260ba728e9963e3af00d13eb46337ee1dc"  # Target hash
+
+# Run the search
+find_matching_hash_gpu(target_sha256)
