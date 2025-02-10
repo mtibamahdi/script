@@ -10,7 +10,7 @@ from numba import cuda
 TARGET_HASH = "40c45198f179492a4008d19f4e67f7260ba728e9963e3af00d13eb46337ee1dc"
 
 # Number of GPUs available (Change based on your setup)
-NUM_GPUS = 4  
+NUM_GPUS = 9 
 
 # Function to generate a random hexadecimal string (64 characters)
 def generate_random_hex_string(length=64):
