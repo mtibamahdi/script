@@ -2,6 +2,7 @@ import hashlib
 import random
 import string
 import cupy as cp
+import numpy as np
 
 # Function to generate a random string
 def generate_random_string(length=64):
@@ -11,12 +12,11 @@ def generate_random_string(length=64):
 def sha256_hash(input_string):
     return hashlib.sha256(input_string.encode()).hexdigest()
 
-# Convert the hash to a GPU array of bytes
+# Convert the hash to a GPU array of integers
 def sha256_gpu(input_string):
     hash_result = hashlib.sha256(input_string.encode()).hexdigest()
-    # Convert hash string to a byte array, and then into a CuPy array
     byte_array = bytes.fromhex(hash_result)
-    return cp.asarray(byte_array)
+    return cp.asarray(np.frombuffer(byte_array, dtype=np.uint8))  # ✅ Convert to uint8
 
 # Function to repeatedly hash using GPU until target hash is found
 def find_matching_hash_gpu(target_hash):
@@ -25,9 +25,9 @@ def find_matching_hash_gpu(target_hash):
     current_hash = sha256_hash(random_string)
     print(f"Initial random hash: {current_hash}")
 
-    # Convert the target hash to a GPU array of bytes
+    # Convert the target hash to a GPU array of integers
     target_hash_bytes = bytes.fromhex(target_hash)
-    target_hash_gpu = cp.asarray(target_hash_bytes)
+    target_hash_gpu = cp.asarray(np.frombuffer(target_hash_bytes, dtype=np.uint8))
 
     # Convert the initial hash to a GPU array
     current_hash_gpu = sha256_gpu(current_hash)
