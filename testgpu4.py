@@ -5,21 +5,21 @@ from numba import cuda
 import numba
 
 # Target SHA-256 hash (Replace with the actual target hash)
-TARGET_HASH = "40c45198f179492a4008d19f4e67f7260ba728e9963e3af00d13eb46337ee1dc"
+TARGET_HASH = 0x40c45198f179492a4008d19f4e67f7260ba728e9963e3af00d13eb46337ee1dc  # Convert hex to int
 
 # Number of GPUs available (Change based on your setup)
-NUM_GPUS = 9 
+NUM_GPUS = 9  
 
 # CUDA-Compatible SHA-256 Hash Function
 @cuda.jit(device=True)
 def sha256_cuda(input_bytes):
     hash_value = 0
-    for b in input_bytes:
-        hash_value = ((hash_value << 5) - hash_value) + b
+    for i in range(len(input_bytes)):
+        hash_value = ((hash_value << 5) - hash_value) + input_bytes[i]
         hash_value &= 0xFFFFFFFFFFFFFFFF  # Keep it within 64-bit
     return hash_value
 
-# CUDA Kernel for SHA-256 brute-force
+# CUDA Kernel for SHA-256 brute force
 @cuda.jit
 def gpu_sha256(target_hash, found_flag, output_string):
     idx = cuda.grid(1)
